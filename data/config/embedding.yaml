@@ -1,0 +1,37 @@
+model_name: "all-MiniLM-L6-v2"
+batch_size: 512
+
+paths:
+  inbox_path: "./data/inbox"
+  datasets_root: "./data/datasets"
+  checkpoints_root: "./data/checkpoints"
+  logs_root: "./data/logs"
+
+collection:
+  name: "attacks_v2"
+  vector_field: "embedding"
+  dim: 384
+  metric_type: "COSINE"
+  index_type: "HNSW"
+  index_params:
+    M: 16
+    efConstruction: 200
+
+embedding_fields:
+  - "important.title"
+  - "important.category"
+  - "important.sub_category"
+  - "important.tags"
+  - "important.targets.os"
+  - "important.targets.system"
+  - "important.risk"
+
+scalar_fields:
+  id: "string"
+  title: "string"
+  category: "string"
+  sub_category: "string"
+  tags: "string[]"
+  os: "string[]"
+  system: "string[]"
+  risk: "string"

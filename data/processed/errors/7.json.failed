@@ -1,0 +1,46 @@
+{
+  "id": "payload_000007",
+  "important": {
+    "title": "Account Takeover - IDOR on Password Change / API Parameters",
+    "category": "Account Takeover",
+    "sub_category": "IDOR / Insecure Direct Object Reference",
+    "tags": ["idor","api","changepass","parameter-tampering","authorization"],
+    "targets": {
+      "os": ["Any"],
+      "system": ["API","Backend Services"]
+    },
+    "risk": "high"
+  },
+  "variants": [
+    {
+      "match": { "os": ["Any"], "system": ["API"] },
+      "payload": "POST /api/changepass {\"form\": {\"email\":\"victim@email.com\",\"password\":\"securepwd\"}}",
+      "notes": "Tamper with user-identifying parameters (user id/email) while authenticated as an attacker to change another user's password."
+    }
+  ],
+  "usage": {
+    "steps": [
+      "Authenticate as attacker account.",
+      "Intercept change-password request in Burp Repeater or Proxy.",
+      "Modify target identifier (userID/email) parameter to victim and send.",
+      "If server lacks proper authorization checks, password changes for victim succeed."
+    ],
+    "required_params": {
+      "auth_cookie": { "required": true, "example": "session=abcd1234" },
+      "change_endpoint": { "required": true, "example": "POST /api/changepass" }
+    },
+    "mitigations": [
+      "Enforce server-side authorization: ensure operations validate ownership and ACLs server-side, not just client-supplied IDs.",
+      "Use strong session management and monitor unusual privilege escalation requests.",
+      "Implement logging and anomaly detection for account modification attempts."
+    ],
+    "references": [
+      "OWASP IDOR Guidelines",
+      "Application-specific bug bounty writeups"
+    ]
+  },
+  "system": {
+    "version": "2.0.0",
+    "source": "PayloadsAllTheThings"
+  }
+}

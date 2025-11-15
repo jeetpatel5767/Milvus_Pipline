@@ -1,0 +1,51 @@
+{
+  "id": "payload_000025",
+  "important": {
+    "title": "CSRF - Tools, Labs & Mitigations",
+    "category": "Web Vulnerabilities",
+    "sub_category": "CSRF - Testing & Defenses",
+    "tags": ["csrf","tools","labs","mitigation","xsrfprobe"],
+    "targets": { "os": ["Any"], "system": ["SecOps","DevOps","Web App"] },
+    "risk": "low"
+  },
+  "variants": [
+    {
+      "match": { "os": ["Any"], "system": ["Tools"] },
+      "payload": {
+        "explanation": "Tools to automate CSRF testing and PoC generation.",
+        "code": "0xInfection/XSRFProbe",
+        "run_context": "Use in testing/lab environments to discover CSRF endpoints and generate PoCs.",
+        "placeholders": {},
+        "notes": "Run only with authorization."
+      }
+    },
+    {
+      "match": { "os": ["Any"], "system": ["Labs"] },
+      "payload": {
+        "explanation": "Labs for practicing CSRF exploitation and validation.",
+        "code": "OWASP WebGoat, PortSwigger labs",
+        "run_context": "Use labs to reproduce and validate mitigations.",
+        "placeholders": {},
+        "notes": "Safe practice environment."
+      }
+    }
+  ],
+  "usage": {
+    "steps": [
+      "Use XSRFProbe and Burp to enumerate endpoints and generate PoCs.",
+      "Test CSRF protections across HTML and JSON endpoints (including file uploads and multipart).",
+      "Validate mitigations in staging and document remediation steps for dev teams."
+    ],
+    "tools": ["0xInfection/XSRFProbe","Burp Suite","Browser devtools"],
+    "code_samples": [
+      { "title": "Simple PoC generator", "description": "Use XSRFProbe to scan and create PoCs", "code": "git clone https://github.com/0xInfection/XSRFProbe && python3 xsrfprobe.py", "run_context": "cli" }
+    ],
+    "mitigations": [
+      "Implement per-request CSRF tokens and validate them server-side.",
+      "Validate Origin/Referer headers for state-changing requests.",
+      "Use SameSite cookie settings and avoid sensitive operations over GET."
+    ],
+    "references": ["OWASP CSRF Cheat Sheet","0xInfection/XSRFProbe"]
+  },
+  "system": { "version": "2.0.0", "source": "PayloadsAllTheThings" }
+}

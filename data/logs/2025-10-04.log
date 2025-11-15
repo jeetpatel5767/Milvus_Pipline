@@ -1,0 +1,33 @@
+[02:34:54] Moved inbox/2.json → datasets/Credential Exposure/API Keys and Tokens/api_key_and_token_leaks_source_code_github_scan_v1.jsonl (records=1)
+[02:37:48] Moved inbox/3.json → datasets/Credential Exposure/API Keys and Tokens/api_key_and_token_leaks_docker_images_config_files_v1.jsonl (records=1)
+[02:38:09] Moved inbox/3.json → datasets/Credential Exposure/API Keys and Tokens/api_key_and_token_leaks_docker_images_config_files_v2.jsonl (records=1)
+[02:38:26] Moved inbox/4.json → datasets/Credential Exposure/API Keys and Tokens/api_key_and_token_leaks_validation_regex_detection_v1.jsonl (records=1)
+[02:42:49] Moved inbox/5.json → datasets/Account Takeover/Password Reset Vulnerabilities/account_takeover_password_reset_flaws_v1.jsonl (records=1)
+[02:43:03] Moved inbox/6.json → datasets/Account Takeover/Token Weakness & Leakage/account_takeover_weak_leaked_reset_tokens_v1.jsonl (records=1)
+[02:43:17] ERROR processing 7.json: [WinError 3] The system cannot find the path specified: 'G:\\Attack-pipeline\\data\\datasets\\Account Takeover\\IDOR \\ Insecure Direct Object Reference'
+[02:43:17] Moved inbox/8.json → datasets/Account Takeover/Web Vulnerabilities/account_takeover_web_vulnerabilities_xss_smuggling_csrf_jwt_unicode_v1.jsonl (records=1)
+[03:07:14] Moved inbox/9.json → datasets/Injection/CRLF Header Injection/crlf_injection_header_manipulation_session_fixation_v1.jsonl (records=1)
+[03:07:28] Moved inbox/10.json → datasets/Injection/HTTP Response Splitting/crlf_injection_response_splitting_xss_phishing_cache_poisoning_v1.jsonl (records=1)
+[03:07:41] Moved inbox/11.json → datasets/Injection/CRLF Filter Bypass/crlf_injection_filter_bypass_utf_8_trick_labs_tools_v1.jsonl (records=1)
+[03:12:08] ERROR processing 12.json: [WinError 3] The system cannot find the path specified: 'G:\\Attack-pipeline\\data\\datasets\\Injection\\CSV \\ Formula Injection'
+[03:12:29] ERROR processing 12.json: [WinError 3] The system cannot find the path specified: 'G:\\Attack-pipeline\\data\\datasets\\Injection\\CSV \\ Formula Injection'
+[03:13:40] ERROR processing 12.json: [WinError 3] The system cannot find the path specified: 'G:\\Attack-pipeline\\data\\datasets\\Injection\\CSV \\ Formula Injection'
+[03:16:21] Moved inbox/13.json → datasets/UI Manipulation/Clickjacking/clickjacking_ui_redressing_v1.jsonl (records=1)
+[03:19:04] ERROR processing 14.json: [WinError 3] The system cannot find the path specified: 'G:\\Attack-pipeline\\data\\datasets\\UI Manipulation\\Overlay \\ Form Hijack'
+[03:19:05] ERROR processing 15.json: [WinError 3] The system cannot find the path specified: 'G:\\Attack-pipeline\\data\\datasets\\UI Manipulation\\Invisible Iframe \\ Anti-bust '
+[03:19:05] Moved inbox/16.json → datasets/UI Protection/Mitigations & Testing/clickjacking_mitigations_tools_labs_v1.jsonl (records=1)
+[03:19:20] Moved inbox/16.json → datasets/UI Protection/Mitigations & Testing/clickjacking_mitigations_tools_labs_v2.jsonl (records=1)
+[03:25:43] ERROR processing 14.json: [WinError 3] The system cannot find the path specified: 'G:\\Attack-pipeline\\data\\datasets\\UI Manipulation\\Overlay \\ Form Hijack'
+[03:25:43] ERROR processing 15.json: [WinError 3] The system cannot find the path specified: 'G:\\Attack-pipeline\\data\\datasets\\UI Manipulation\\Invisible Iframe \\ Anti-bust '
+[03:26:40] Moved inbox/14.json → datasets/UI Manipulation/Overlay - Form Hijack/clickjacking_ui_redressing_button_form_hijack_v1.jsonl (records=1)
+[03:26:59] Moved inbox/15.json → datasets/UI Manipulation/Invisible Iframe - Anti-bust/clickjacking_invisible_iframe_anti_bust_v1.jsonl (records=1)
+[03:29:36] Moved inbox/17.json → datasets/Web Vulnerabilities/Client-Side Path Traversal/client_side_path_traversal_cspt_cspt2csrf_v1.jsonl (records=1)
+[03:34:07] Moved inbox/18.json → datasets/Web Vulnerabilities/Command Injection - Basic/command_injection_basic_commands_v1.jsonl (records=1)
+[03:34:22] Moved inbox/19.json → datasets/Web Vulnerabilities/Argument Injection/command_injection_argument_injection_v1.jsonl (records=1)
+[03:34:36] Moved inbox/20.json → datasets/Web Vulnerabilities/Filter Bypasses/command_injection_filter_bypasses_v1.jsonl (records=1)
+[03:34:49] ERROR processing 21.json: [WinError 3] The system cannot find the path specified: 'G:\\Attack-pipeline\\data\\datasets\\Web Vulnerabilities\\Polyglot \\ Tricks'
+[03:34:50] Moved inbox/22.json → datasets/Web Vulnerabilities/Data Exfiltration/command_injection_data_exfiltration_time_dns_v1.jsonl (records=1)
+[03:38:03] Moved inbox/21.json → datasets/Web Vulnerabilities/Polyglot - Tricks/command_injection_polyglot_tricks_v1.jsonl (records=1)
+[03:43:59] Moved inbox/23.json → datasets/Web Vulnerabilities/CSRF - HTML Methods/csrf_html_get_post_autosubmit_file_upload_v1.jsonl (records=1)
+[03:44:15] Moved inbox/24.json → datasets/Web Vulnerabilities/CSRF - JSON Methods/csrf_json_get_post_complex_json_requests_v1.jsonl (records=1)
+[03:44:29] Moved inbox/25.json → datasets/Web Vulnerabilities/CSRF - Testing & Defenses/csrf_tools_labs_mitigations_v1.jsonl (records=1)

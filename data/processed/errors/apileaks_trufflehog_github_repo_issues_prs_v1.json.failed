@@ -1,0 +1,34 @@
+{
+"id": "apileaks_trufflehog_github_repo_issues_prs_v1",
+"important": {
+"title": "Scan GitHub repo (code, issues, PRs) for leaked API keys",
+"category": "API Key and Token Leaks",
+"sub_category": "Discovery - GitHub",
+"tags": ["secrets", "api-keys", "token", "github", "issues", "pull-requests", "trufflehog"],
+"targets": { "os": ["Any"], "system": ["GitHub"] },
+"risk": "high"
+},
+"variants": [
+{
+"match": { "os": ["Any"], "system": ["GitHub"] },
+"payload": "docker run --rm -it -v "$PWD:/pwd" trufflesecurity/trufflehog:latest github --repo {{REPO_URL}} --issue-comments --pr-comments",
+"notes": "Scans a specific repo including issue and PR comments"
+}
+],
+"usage": {
+"steps": [
+"Ensure Docker is available",
+"Replace {{REPO_URL}} with the HTTPS repo URL",
+"Run the command to scan code, issues, and PRs for secrets"
+],
+"required_params": {
+"REPO_URL": { "required": true, "example": "https://github.com/org/project" }
+},
+"mitigations": [
+"Revoke any exposed tokens immediately",
+"Enable repository-wide secret scanning"
+],
+"references": ["PayloadsAllTheThings/API Key Leaks"]
+},
+"system": { "version": "2.0.0", "source": "PayloadsAllTheThings" }
+}

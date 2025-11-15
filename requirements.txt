@@ -1,0 +1,6 @@
+pyyaml
+torch
+pymilvus>=2.4.0
+sentence-transformers
+numpy
+tqdm

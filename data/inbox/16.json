@@ -1,0 +1,67 @@
+{
+  "id": "payload_000016",
+  "important": {
+    "title": "Clickjacking - Mitigations, Tools & Labs",
+    "category": "UI Protection",
+    "sub_category": "Mitigations & Testing",
+    "tags": ["x-frame-options","csp","csrf","labs","testing","clickjacking-protection"],
+    "targets": { "os": ["Any"], "system": ["Web App","DevOps","SecOps"] },
+    "risk": "low"
+  },
+  "variants": [
+    {
+      "match": { "os": ["Any"], "system": ["Mitigation"] },
+      "payload": {
+        "explanation": "Server-side headers and CSP to prevent framing and protect against clickjacking.",
+        "code": "Header: X-Frame-Options: DENY\nor\nContent-Security-Policy: frame-ancestors 'self';",
+        "run_context": "Set in web server (nginx/Apache) or application response headers.",
+        "placeholders": { "DOMAIN": "yourdomain.example" },
+        "notes": "CSP frame-ancestors preferred for granular control; ensure headers applied on all responses."
+      }
+    },
+    {
+      "match": { "os": ["Any"], "system": ["Testing / Labs"] },
+      "payload": {
+        "explanation": "Tools and labs for testing clickjacking and building PoCs.",
+        "code": "Tools: portswigger/burp, zaproxy/zaproxy, machine1337/clickjack\nLabs: OWASP WebGoat, OWASP Client Side Clickjacking Test",
+        "run_context": "Use in security testing environments and staging sites (never on production targets without permission).",
+        "placeholders": {},
+        "notes": "Use labs to reproduce and validate mitigation effectiveness."
+      }
+    }
+  ],
+  "usage": {
+    "steps": [
+      "Apply X-Frame-Options or CSP frame-ancestors headers across the site.",
+      "Test using labs (WebGoat) and tools to confirm pages cannot be framed.",
+      "Validate CSRF protections on state-changing endpoints and set SameSite on cookies.",
+      "Document fixes and roll out to all environments."
+    ],
+    "tools": ["Burp Suite", "ZAP", "machine1337/clickjack", "OWASP WebGoat"],
+    "required_params": {},
+    "code_samples": [
+      {
+        "title": "Nginx header example",
+        "description": "Set CSP frame-ancestors in nginx config",
+        "code": "add_header Content-Security-Policy \"frame-ancestors 'self'\" always;",
+        "placeholders": { "NGINX_CONF": "/etc/nginx/conf.d/site.conf" },
+        "run_context": "nginx"
+      },
+      {
+        "title": "Apache header example",
+        "description": "Set X-Frame-Options in Apache",
+        "code": "Header always append X-Frame-Options SAMEORIGIN",
+        "placeholders": {},
+        "run_context": "apache"
+      }
+    ],
+    "mitigations": [
+      "X-Frame-Options: DENY or SAMEORIGIN",
+      "CSP frame-ancestors 'self' or allowlist specific domains",
+      "Enforce CSRF tokens and verify Origin/Referer",
+      "Set SameSite cookie policy and HttpOnly/Secure flags"
+    ],
+    "references": ["OWASP Clickjacking Cheat Sheet", "PortSwigger - Clickjacking"]
+  },
+  "system": { "version": "2.0.0", "source": "PayloadsAllTheThings" }
+}

